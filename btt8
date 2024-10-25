@@ -1,0 +1,159 @@
+#include <iostream>
+using namespace std;
+
+// Khai báo cấu trúc Ngay, SinhVien, Node và List như đã nêu ở phần trước
+
+struct Ngay {
+    int ngay;
+    int thang;
+    int nam;
+};
+
+struct SinhVien {
+    char maSV[8];       // Mã sinh viên (7 ký tự + 1 ký tự kết thúc chuỗi)
+    char hoTen[50];     // Họ tên sinh viên (49 ký tự + 1 ký tự kết thúc chuỗi)
+    int gioiTinh;       // Giới tính (0: Nữ, 1: Nam)
+    Ngay ngaySinh;      // Ngày sinh
+    char diaChi[100];   // Địa chỉ sinh viên
+    char lop[12];       // Lớp sinh viên
+    char khoa[7];       // Khoa sinh viên
+};
+
+struct Node {
+    SinhVien data;      // Dữ liệu sinh viên
+    Node* link;         // Con trỏ đến nút tiếp theo
+};
+
+struct List {
+    Node* first;        // Con trỏ đến nút đầu tiên của danh sách
+    Node* last;         // Con trỏ đến nút cuối cùng của danh sách
+};
+
+// Hàm khởi tạo danh sách sinh viên rỗng
+void initList(List &list) {
+    list.first = nullptr;
+    list.last = nullptr;
+}
+
+// Hàm so sánh mã sinh viên (so sánh từng ký tự)
+int SSMaSV(char maSV1[], char maSV2[]) {
+    for (int i = 0; i < 7; i++) {
+        if (maSV1[i] < maSV2[i]) return -1;
+        if (maSV1[i] > maSV2[i]) return 1;
+    }
+    return 0; // Hai mã sinh viên bằng nhau
+}
+
+// Hàm thêm sinh viên vào danh sách đã sắp xếp theo mã sinh viên
+void ThemSV(List &list, SinhVien sv) {
+    Node* newNode = new Node;
+    newNode->data = sv;
+    newNode->link = nullptr;
+
+    if (list.first == nullptr || SSMaSV(sv.maSV, list.first->data.maSV) < 0) {
+        // Thêm vào đầu danh sách nếu rỗng hoặc mã SV nhỏ nhất
+        newNode->link = list.first;
+        list.first = newNode;
+        if (list.last == nullptr) list.last = newNode; // Trường hợp danh sách rỗng
+    } else {
+        // Tìm vị trí phù hợp để chèn vào danh sách
+        Node* current = list.first;
+        while (current->link != nullptr && SSMaSV(current->link->data.maSV, sv.maSV) < 0) {
+            current = current->link;
+        }
+        newNode->link = current->link;
+        current->link = newNode;
+        if (newNode->link == nullptr) list.last = newNode; // Cập nhật last nếu là nút cuối
+    }
+}
+
+// Hàm in danh sách sinh viên
+void printList(const List &list) {
+    Node* current = list.first;
+    while (current != nullptr) {
+        cout << "Ma SV: " << current->data.maSV << " - Ho ten: " << current->data.hoTen << endl;
+        current = current->link;
+    }
+}
+// Hàm so sánh ngày sinh
+bool sameBirthday(Ngay ngay1, Ngay ngay2) {
+    return (ngay1.ngay == ngay2.ngay && ngay1.thang == ngay2.thang && ngay1.nam == ngay2.nam);
+}
+
+// Hàm in các sinh viên có cùng ngày sinh
+void Cungngaysinh(const List &list, Ngay ngaySinh) {
+    Node* current = list.first;
+    bool found = false;
+
+    while (current != nullptr) {
+        if (sameBirthday(current->data.ngaySinh, ngaySinh)) {
+            cout << "Ma SV: " << current->data.maSV << " - Ho ten: " << current->data.hoTen << endl;
+            found = true;
+        }
+        current = current->link;
+    }
+
+    if (!found) {
+        cout << "Khong tim thay sinh vien cung ngay sinh" << endl;
+    }
+}
+// Hàm xóa sinh viên có cùng ngày sinh
+void xoaCungngaysinh(List &list, Ngay ngaySinh) {
+    Node* current = list.first;
+    Node* prev = nullptr;
+
+    while (current != nullptr) {
+        if (sameBirthday(current->data.ngaySinh, ngaySinh)) {
+            // Nếu tìm thấy sinh viên có cùng ngày sinh
+            if (prev == nullptr) {
+                // Xóa sinh viên đầu danh sách
+                list.first = current->link;
+            } else {
+                // Xóa sinh viên ở giữa hoặc cuối danh sách
+                prev->link = current->link;
+            }
+
+            if (current->link == nullptr) {
+                list.last = prev; // Cập nhật nếu là nút cuối
+            }
+
+            Node* temp = current;
+            current = current->link;
+            delete temp; // Giải phóng bộ nhớ của nút đã xóa
+        } else {
+            prev = current;
+            current = current->link;
+        }
+    }
+}
+int main() {
+    List list;
+    initList(list);
+
+    // Ví dụ thêm sinh viên
+    SinhVien sv1 = {"1234567", "Nguyen Quy Dang", 1, {15, 5, 2000}, "Ha Noi", "K68", "CNTT"};
+    SinhVien sv2 = {"8756393", "Duong Quang Tu", 0, {20, 10, 2000}, "Hai Phong", "K67", "CNTT"};
+    SinhVien sv3 = {"3456789", "Pham Tra Mi", 1, {15, 5, 2000}, "Da Nang", "K69", "CNTT"};
+
+    ThemSV(list, sv1);
+    ThemSV(list, sv2);
+    ThemSV(list, sv3);
+
+    // In danh sách sinh viên
+    cout << "Danh sach sinh vien: " << endl;
+    printList(list);
+
+    // In sinh viên có cùng ngày sinh
+    cout << "\nSinh vien co cung ngay sinh 15/5/2000: " << endl;
+    Cungngaysinh(list, {15, 5, 2000});
+
+    // Xóa sinh viên có cùng ngày sinh
+    xoaCungngaysinh(list, {15, 5, 2000});
+
+    // In lại danh sách sau khi xóa
+    cout << "\nDanh sach sinh vien sau khi xoa: " << endl;
+    printList(list);
+
+    return 0;
+}
+
