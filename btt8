@@ -131,9 +131,9 @@ int main() {
     initList(list);
 
     // Ví dụ thêm sinh viên
-    SinhVien sv1 = {"1234567", "Nguyen Quy Dang", 1, {15, 5, 2000}, "Ha Noi", "K68", "CNTT"};
-    SinhVien sv2 = {"8756393", "Duong Quang Tu", 0, {20, 10, 2000}, "Hai Phong", "K67", "CNTT"};
-    SinhVien sv3 = {"3456789", "Pham Tra Mi", 1, {15, 5, 2000}, "Da Nang", "K69", "CNTT"};
+    SinhVien sv1 = {"1234567", "Nguyen Quy Dang", 1, {15, 5, 2004}, "Ha Noi", "K68", "CNTT"};
+    SinhVien sv2 = {"8756393", "Duong Quang Tu", 0, {20, 10, 2004}, "Hai Phong", "K67", "CNTT"};
+    SinhVien sv3 = {"3456789", "Pham Tra Mi", 1, {15, 5, 2004}, "Da Nang", "K69", "CNTT"};
 
     ThemSV(list, sv1);
     ThemSV(list, sv2);
@@ -144,11 +144,11 @@ int main() {
     printList(list);
 
     // In sinh viên có cùng ngày sinh
-    cout << "\nSinh vien co cung ngay sinh 15/5/2000: " << endl;
-    Cungngaysinh(list, {15, 5, 2000});
+    cout << "\nSinh vien co cung ngay sinh: " << endl;
+    Cungngaysinh(list, {15, 5, 2004});
 
     // Xóa sinh viên có cùng ngày sinh
-    xoaCungngaysinh(list, {15, 5, 2000});
+    xoaCungngaysinh(list, {15, 5, 2004});
 
     // In lại danh sách sau khi xóa
     cout << "\nDanh sach sinh vien sau khi xoa: " << endl;
