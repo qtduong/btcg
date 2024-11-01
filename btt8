@@ -1,8 +1,6 @@
 #include <iostream>
 using namespace std;
 
-// Khai báo cấu trúc Ngay, SinhVien, Node và List như đã nêu ở phần trước
-
 struct Ngay {
     int ngay;
     int thang;
