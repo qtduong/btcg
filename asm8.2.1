@@ -1,0 +1,58 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    Node(int value) : data(value), next(nullptr) {}
+};
+
+// Hàm để tạo danh sách liên kết vòng tròn với N người
+Node* createCircularList(int N) {
+    Node* head = new Node(1);
+    Node* prev = head;
+    for (int i = 2; i <= N; i++) {
+        Node* newNode = new Node(i);
+        prev->next = newNode;
+        prev = newNode;
+    }
+    prev->next = head;  // Tạo vòng tròn
+    return head;
+}
+
+// Hàm để tìm người chiến thắng
+int josephus(int N, int M) {
+    Node* head = createCircularList(N);
+    Node* prev = nullptr;
+
+    while (head->next != head) {  // Lặp cho đến khi chỉ còn một người
+        // Di chuyển M-1 bước đến người cần loại bỏ
+        for (int i = 1; i < M; i++) {
+            prev = head;
+            head = head->next;
+        }
+
+        // Loại bỏ người chơi hiện tại
+        prev->next = head->next;
+        cout << "Loại bỏ người: " << head->data << endl;
+        delete head;
+        head = prev->next;  // Di chuyển đến người tiếp theo
+    }
+
+    int winner = head->data;
+    delete head;  // Xóa người cuối cùng
+    return winner;
+}
+
+int main() {
+    int N, M;
+    cout << "Nhập N: ";
+    cin >> N;
+    cout << "Nhập M: ";
+    cin >> M;
+
+    int winner = josephus(N, M);
+    cout << "Người chiến thắng là: " << winner << endl;
+
+    return 0;
+}
