@@ -131,7 +131,7 @@ int main() {
     // Ví dụ thêm sinh viên
     SinhVien sv1 = {"1234567", "Nguyen Quy Dang", 1, {15, 5, 2004}, "Ha Noi", "K68", "CNTT"};
     SinhVien sv2 = {"8756393", "Duong Quang Tu", 0, {20, 10, 2004}, "Hai Phong", "K67", "CNTT"};
-    SinhVien sv3 = {"3456789", "Pham Tra Mi", 1, {15, 5, 2004}, "Da Nang", "K69", "CNTT"};
+    SinhVien sv3 = {"3456789", "Hoang Duc Manh", 1, {15, 5, 2004}, "Da Nang", "K69", "CNTT"};
 
     ThemSV(list, sv1);
     ThemSV(list, sv2);
