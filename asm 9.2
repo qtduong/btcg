@@ -1,0 +1,187 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    char tu[50];     // Lưu trữ từ trong câu, giới hạn tối đa 50 ký tự
+    int so_lan;      // Số lần xuất hiện của từ này
+    Node* tiep;      // Con trỏ tới từ tiếp theo
+
+    Node(const char* tuMoi) {
+        saoChepChuoi(tu, tuMoi);  // Sao chép từ vào mảng ký tự
+        so_lan = 1;
+        tiep = nullptr;
+    }
+
+    // Hàm tự viết để sao chép chuỗi
+    void saoChepChuoi(char* dich, const char* nguon) {
+        int i = 0;
+        while (nguon[i] != '\0' && i < 49) {
+            dich[i] = nguon[i];
+            i++;
+        }
+        dich[i] = '\0';  // Đảm bảo chuỗi kết thúc
+    }
+
+    // Hàm tự viết để tính độ dài chuỗi
+    int doDaiChuoi(const char* chuoi) {
+        int dem = 0;
+        while (chuoi[dem] != '\0') {
+            dem++;
+        }
+        return dem;
+    }
+};
+
+class DanhSachTu {
+private:
+    Node* dau;
+
+public:
+    DanhSachTu() : dau(nullptr) {}
+
+    // Thêm từ vào danh sách hoặc tăng số lần xuất hiện nếu đã có
+    void themTu(const char* tuMoi) {
+        Node* hienTai = dau;
+        Node* truoc = nullptr;
+
+        // Tìm xem từ đã có trong danh sách chưa
+        while (hienTai != nullptr) {
+            if (soSanhChuoi(hienTai->tu, tuMoi) == 0) {
+                hienTai->so_lan++;
+                return;
+            }
+            truoc = hienTai;
+            hienTai = hienTai->tiep;
+        }
+
+        // Nếu từ chưa có, thêm mới vào cuối danh sách
+        Node* moi = new Node(tuMoi);
+        if (truoc == nullptr) {
+            dau = moi;
+        }
+        else {
+            truoc->tiep = moi;
+        }
+    }
+
+    // Tìm từ xuất hiện nhiều nhất
+    const char* timTuNhieuNhat() {
+        Node* hienTai = dau;
+        Node* tuNhieuNhat = nullptr;
+        int maxSoLan = 0;
+
+        while (hienTai != nullptr) {
+            if (hienTai->so_lan > maxSoLan) {
+                maxSoLan = hienTai->so_lan;
+                tuNhieuNhat = hienTai;
+            }
+            hienTai = hienTai->tiep;
+        }
+
+        return tuNhieuNhat ? tuNhieuNhat->tu : nullptr;
+    }
+
+    // Xóa từ láy (từ có hai phần giống nhau, ví dụ "xanh xanh")
+    void xoaTuLay() {
+        Node* hienTai = dau;
+        Node* truoc = nullptr;
+
+        while (hienTai != nullptr) {
+            int doDai = hienTai->doDaiChuoi(hienTai->tu);
+            if (doDai % 2 == 0) {
+                int nuaDoDai = doDai / 2;
+                bool laTuLay = true;
+                for (int i = 0; i < nuaDoDai; i++) {
+                    if (hienTai->tu[i] != hienTai->tu[i + nuaDoDai]) {
+                        laTuLay = false;
+                        break;
+                    }
+                }
+                if (laTuLay) {
+                    if (truoc == nullptr) {
+                        dau = hienTai->tiep;
+                    }
+                    else {
+                        truoc->tiep = hienTai->tiep;
+                    }
+                    Node* canXoa = hienTai;
+                    hienTai = hienTai->tiep;
+                    delete canXoa;
+                    continue;
+                }
+            }
+            truoc = hienTai;
+            hienTai = hienTai->tiep;
+        }
+    }
+
+    // Đếm số từ vựng khác nhau trong danh sách
+    int demSoTuVung() {
+        int soTuVung = 0;
+        Node* hienTai = dau;
+        while (hienTai != nullptr) {
+            soTuVung++;
+            hienTai = hienTai->tiep;
+        }
+        return soTuVung;
+    }
+
+    // Hiển thị tất cả các từ trong danh sách
+    void hienThiDanhSach() {
+        Node* hienTai = dau;
+        while (hienTai != nullptr) {
+            cout << "Tu: " << hienTai->tu << ", So lan: " << hienTai->so_lan << endl;
+            hienTai = hienTai->tiep;
+        }
+    }
+
+    // Giải phóng bộ nhớ
+    ~DanhSachTu() {
+        while (dau != nullptr) {
+            Node* canXoa = dau;
+            dau = dau->tiep;
+            delete canXoa;
+        }
+    }
+
+    // Hàm so sánh chuỗi
+    int soSanhChuoi(const char* chuoi1, const char* chuoi2) {
+        int i = 0;
+        while (chuoi1[i] != '\0' && chuoi2[i] != '\0') {
+            if (chuoi1[i] != chuoi2[i]) return chuoi1[i] - chuoi2[i];
+            i++;
+        }
+        return chuoi1[i] - chuoi2[i];
+    }
+};
+
+int main() {
+    DanhSachTu danhSach;
+
+    // Thêm từ vào danh sách
+    danhSach.themTu("xanh");
+    danhSach.themTu("do");
+    danhSach.themTu("xanh");
+    danhSach.themTu("vang");
+    danhSach.themTu("xanhxanh");
+
+    cout << "Danh sach cac tu trong cau:" << endl;
+    danhSach.hienThiDanhSach();
+
+    // Tìm từ xuất hiện nhiều nhất
+    const char* tuNhieuNhat = danhSach.timTuNhieuNhat();
+    if (tuNhieuNhat) {
+        cout << "Tu xuat hien nhieu nhat: " << tuNhieuNhat << endl;
+    }
+
+    // Xóa từ láy nếu có
+    danhSach.xoaTuLay();
+    cout << "\nDanh sach sau khi xoa tu lay:" << endl;
+    danhSach.hienThiDanhSach();
+
+    // Đếm số từ vựng khác nhau
+    int soTuVung = danhSach.demSoTuVung();
+    cout << "So tu vung khac nhau: " << soTuVung << endl;
+
+    return 0;
+}
