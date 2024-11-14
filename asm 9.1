@@ -1,0 +1,79 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    string ten_file;     // Tên file
+    int kich_thuoc;      // Kích thước file (KB)
+    int thu_tu;          // Thứ tự tạo file
+    Node* tiep_theo;     // Con trỏ tới file tiếp theo
+
+    Node(string ten, int kichThuoc, int thuTu)
+        : ten_file(ten), kich_thuoc(kichThuoc), thu_tu(thuTu), tiep_theo(nullptr) {}
+};
+
+class DanhSachFile {
+private:
+    Node* dau;
+
+public:
+    DanhSachFile() : dau(nullptr) {}
+
+    // Hàm thêm file mới vào danh sách theo thứ tự thời gian (thu_tu)
+    void themFile(string ten, int kichThuoc, int thuTu) {
+        Node* moi = new Node(ten, kichThuoc, thuTu);
+
+        // Nếu danh sách trống hoặc thu_tu của file mới nhỏ hơn file đầu tiên
+        if (!dau || dau->thu_tu > thuTu) {
+            moi->tiep_theo = dau;
+            dau = moi;
+        }
+        else {
+            Node* hien_tai = dau;
+            while (hien_tai->tiep_theo && hien_tai->tiep_theo->thu_tu <= thuTu) {
+                hien_tai = hien_tai->tiep_theo;
+            }
+            moi->tiep_theo = hien_tai->tiep_theo;
+            hien_tai->tiep_theo = moi;
+        }
+    }
+
+    // Hàm tính tổng kích thước các file trong danh sách
+    int tinhTongKichThuoc() {
+        int tongKichThuoc = 0;
+        Node* hien_tai = dau;
+        while (hien_tai) {
+            tongKichThuoc += hien_tai->kich_thuoc;
+            hien_tai = hien_tai->tiep_theo;
+        }
+        return tongKichThuoc;
+    }
+
+    // Hàm hiển thị danh sách các file
+    void hienThiDanhSach() {
+        Node* hien_tai = dau;
+        while (hien_tai) {
+            cout << "Ten file: " << hien_tai->ten_file
+                << ", Kich thuoc: " << hien_tai->kich_thuoc << " KB"
+                << ", Thu tu: " << hien_tai->thu_tu << endl;
+            hien_tai = hien_tai->tiep_theo;
+        }
+    }
+};
+
+int main() {
+    DanhSachFile dsFile;
+
+    // Thêm các file vào danh sách
+    dsFile.themFile("file1.doc", 1024, 1);
+    dsFile.themFile("file2.doc", 2048, 2);
+    dsFile.themFile("file3.doc", 512, 3);
+
+    cout << "Danh sach trong thu muc:" << endl;
+    dsFile.hienThiDanhSach();
+
+    // Tính tổng kích thước các file
+    int tongKichThuoc = dsFile.tinhTongKichThuoc();
+    cout << "Tong kich thuoc file: " << tongKichThuoc << " KB" << endl;
+
+    return 0;
+}
