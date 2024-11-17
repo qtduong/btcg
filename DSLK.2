@@ -1,0 +1,125 @@
+#include <iostream>
+using namespace std;
+
+struct TepTin {
+    string ten;         // Tên tệp
+    int kichThuoc;      // Dung lượng (KB)
+    int thoiGian;       // Thời gian lưu lần cuối (đơn vị giả định)
+    TepTin* tiepTheo;   // Con trỏ tới tệp tiếp theo
+};
+
+// Hàm thêm tệp vào danh sách
+void themTep(TepTin*& dau, string tenTep, int dungLuong, int thoiGian) {
+    TepTin* moi = new TepTin{ tenTep, dungLuong, thoiGian, nullptr };
+    if (!dau) {
+        dau = moi;
+        return;
+    }
+    TepTin* tam = dau;
+    while (tam->tiepTheo) {
+        tam = tam->tiepTheo;
+    }
+    tam->tiepTheo = moi;
+}
+
+// Hàm in danh sách tệp
+void inDanhSach(TepTin* dau) {
+    TepTin* tam = dau;
+    while (tam) {
+        cout << "Tep: " << tam->ten
+            << ", Kich thuoc: " << tam->kichThuoc << " KB"
+            << ", Thoi gian: " << tam->thoiGian << endl;
+        tam = tam->tiepTheo;
+    }
+}
+
+// Hàm tìm dung lượng nhỏ nhất trong danh sách
+int timKichThuocNhoNhat(TepTin* dau) {
+    if (!dau) return -1;  // Danh sách rỗng
+    int nhoNhat = dau->kichThuoc;
+    TepTin* tam = dau;
+    while (tam) {
+        if (tam->kichThuoc < nhoNhat) {
+            nhoNhat = tam->kichThuoc;
+        }
+        tam = tam->tiepTheo;
+    }
+    return nhoNhat;
+}
+// Sắp xếp danh sách theo dung lượng tăng dần
+void sapXepTangDan(TepTin*& dau) {
+    if (!dau || !dau->tiepTheo) return;
+    for (TepTin* i = dau; i; i = i->tiepTheo) {
+        for (TepTin* j = i->tiepTheo; j; j = j->tiepTheo) {
+            if (i->kichThuoc > j->kichThuoc ||
+                (i->kichThuoc == j->kichThuoc && i->thoiGian > j->thoiGian)) {
+                swap(i->ten, j->ten);
+                swap(i->kichThuoc, j->kichThuoc);
+                swap(i->thoiGian, j->thoiGian);
+            }
+        }
+    }
+}
+
+// Xóa tệp đầu danh sách
+void xoaTepDau(TepTin*& dau) {
+    if (!dau) return;
+    TepTin* tam = dau;
+    dau = dau->tiepTheo;
+    delete tam;
+}
+
+// Xóa các tệp có dung lượng nhỏ nhất và thời gian lưu lâu nhất
+void xoaTepCoDieuKien(TepTin*& dau) {
+    if (!dau) return;
+
+    // Tìm dung lượng nhỏ nhất
+    int dungLuongNhoNhat = timKichThuocNhoNhat(dau);
+
+    // Lặp qua danh sách và xóa các tệp có dung lượng nhỏ nhất, ưu tiên thơi gian lưu lâu nhất
+    TepTin* truoc = nullptr;
+    TepTin* hienTai = dau;
+
+    while (hienTai) {
+        if (hienTai->kichThuoc == dungLuongNhoNhat) {
+            if (!truoc) { // Nếu là tệp đầu
+                xoaTepDau(dau);
+                hienTai = dau;
+            }
+            else { // Nếu là tệp ở giữa hoặc cuối
+                truoc->tiepTheo = hienTai->tiepTheo;
+                delete hienTai;
+                hienTai = truoc->tiepTheo;
+            }
+        }
+        else {
+            truoc = hienTai;
+            hienTai = hienTai->tiepTheo;
+        }
+    }
+}
+
+int main() {
+    TepTin* thuMuc = nullptr;
+
+    // Thêm các tệp vào danh sách
+    themTep(thuMuc, "a.txt", 100, 10);
+    themTep(thuMuc, "b.txt", 50, 20);
+    themTep(thuMuc, "c.txt", 50, 15);
+    themTep(thuMuc, "d.txt", 150, 5);
+    themTep(thuMuc, "e.txt", 50, 25);
+
+    cout << "Danh sach ban dau:" << endl;
+    inDanhSach(thuMuc);
+    // Sắp xếp danh sách theo dung lượng tăng dần
+    sapXepTangDan(thuMuc);
+    cout << "\nDanh sach sau khi sap xep tang dan theo dung luong:" << endl;
+    inDanhSach(thuMuc);
+
+    // Xóa các tệp có dung lượng nhỏ nhất và thời gian lưu lâu nhất
+    xoaTepCoDieuKien(thuMuc);
+    cout << "\nDanh sach sau khi xoa tep co dung luong nho nhat va thoi gian luu lau nhat:" << endl;
+    inDanhSach(thuMuc);
+
+    return 0;
+}
